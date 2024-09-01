@@ -5,33 +5,33 @@ An event is a mechanism for emitting notifications about specific actions or sta
 
 
 ```rust
-	#[pallet::event]
-	#[pallet::generate_deposit(pub(super) fn deposit_event)]
-	pub enum Event<T: Config> {
-		/// A user has successfully set a new value.
-		SomethingStored {
-			/// The new value set.
-			something: u32,
-			/// The account who set the new value.
-			who: T::AccountId,
-		},
-	}
+#[pallet::event]
+#[pallet::generate_deposit(pub(super) fn deposit_event)]
+pub enum Event<T: Config> {
+    /// A user has successfully set a new value.
+    SomethingStored {
+        /// The new value set.
+        something: u32,
+        /// The account who set the new value.
+        who: T::AccountId,
+    },
+}
 ```
 
 ```rust
-	#[pallet::call_index(0)]
-		#[pallet::weight(T::WeightInfo::do_something())]
-		pub fn do_something(origin: OriginFor<T>, something: u32) -> DispatchResult {
-			// Check that the extrinsic was signed and get the signer.
-			let who = ensure_signed(origin)?;
+#[pallet::call_index(0)]
+#[pallet::weight(T::WeightInfo::do_something())]
+pub fn do_something(origin: OriginFor<T>, something: u32) -> DispatchResult {
+    // Check that the extrinsic was signed and get the signer.
+		let who = ensure_signed(origin)?;
 
-			// Update storage.
-			Something::<T>::put(something);
+		// Update storage.
+		Something::<T>::put(something);
 
-			// Emit an event.
-			Self::deposit_event(Event::SomethingStored { something, who });
+		// Emit an event.
+		Self::deposit_event(Event::SomethingStored { something, who });
 
-			// Return a successful `DispatchResult`
-			Ok(())
-		}
+		// Return a successful `DispatchResult`
+		Ok(())
+}
 ```
