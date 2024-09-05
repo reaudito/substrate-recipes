@@ -90,7 +90,9 @@
             <div class="sidebar-scrollbox">
                 <ol class="chapter"><li class="chapter-item expanded "><a href="using_events.html" class="active"><strong aria-hidden="true">1.</strong> Using Events</a></li></ol>
             </div>
-            <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
+            <div id="sidebar-resize-handle" class="sidebar-resize-handle">
+                <div class="sidebar-resize-indicator"></div>
+            </div>
         </nav>
 
         <!-- Track and set sidebar scroll position -->
@@ -193,19 +195,21 @@ pub enum Event&lt;T: Config&gt; {
 #[pallet::weight(T::WeightInfo::do_something())]
 pub fn do_something(origin: OriginFor&lt;T&gt;, something: u32) -&gt; DispatchResult {
     // Check that the extrinsic was signed and get the signer.
-		let who = ensure_signed(origin)?;
+    let who = ensure_signed(origin)?;
 
-		// Update storage.
-		Something::&lt;T&gt;::put(something);
+    // Update storage.
+    Something::&lt;T&gt;::put(something);
 
-		// Emit an event.
-		Self::deposit_event(Event::SomethingStored { something, who });
+    // Emit an event.
+    Self::deposit_event(Event::SomethingStored { something, who });
 
-		// Return a successful `DispatchResult`
-		Ok(())
+    // Return a successful `DispatchResult`
+    Ok(())
 }
 <span class="boring">}</span></code></pre></pre>
-
+<h2 id="quiz"><a class="header" href="#quiz">Quiz</a></h2>
+<div class="quiz-placeholder" data-quiz-name="using_events"  data-quiz-questions="{&quot;questions&quot;:[{&quot;id&quot;:&quot;463d3dec-49f2-4748-baa4-75fee31d49d4&quot;,&quot;type&quot;:&quot;MultipleChoice&quot;,&quot;answer&quot;:{&quot;answer&quot;:&quot;A notification mechanism&quot;},&quot;prompt&quot;:{&quot;distractors&quot;:[&quot;Transaction on the blockchain&quot;,&quot;A smart contract function&quot;,&quot;A consensus algorithm&quot;],&quot;prompt&quot;:&quot;Which of the following best describes an event in the context of substrate blockchain runtime?\n&quot;}},{&quot;context&quot;:&quot;It may display as a wrong answer, even if the answer is correct, if the spacing does not match. Please ignore it if this happens.&quot;,&quot;id&quot;:&quot;b317de89-93f8-48d1-8157-3c8c28fb5b13&quot;,&quot;type&quot;:&quot;ShortAnswer&quot;,&quot;answer&quot;:{&quot;answer&quot;:&quot;Self::deposit_event(Event::MemberAdded { member_id, who });&quot;},&quot;prompt&quot;:{&quot;prompt&quot;:&quot;Emit the `MemberAdded` event with `member_id` and `who`.\n\n```rust\n#[pallet::event]\n#[pallet::generate_deposit(pub(super) fn deposit_event)]\npub enum Event&lt;T: Config&gt; {\n    MemberAdded {\n        member_id: u32,\n        who: T::AccountId,\n    },\n}\n\n#[pallet::call_index(0)]\n#[pallet::weight(T::WeightInfo::add_member())]\npub fn add_member(origin: OriginFor&lt;T&gt;, member_id: u32) -&gt; DispatchResult {\n    let who = ensure_signed(origin)?;\n\n    MemberId::&lt;T&gt;::put(member_id);\n\n    // Emit an event.\n    ______________________\n\n    Ok(())\n}\n```\n&quot;}}]}" ></div>
+<script type="text/javascript" src="quiz/quiz-embed.iife.js"></script><link rel="stylesheet" type="text/css" href="quiz/style.css">
                     </main>
 
                     <nav class="nav-wrapper" aria-label="Page navigation">
@@ -223,6 +227,22 @@ pub fn do_something(origin: OriginFor&lt;T&gt;, something: u32) -&gt; DispatchRe
 
         </div>
 
+        <!-- Livereload script (if served using the cli tool) -->
+        <script>
+            const wsProtocol = location.protocol === 'https:' ? 'wss:' : 'ws:';
+            const wsAddress = wsProtocol + "//" + location.host + "/" + "__livereload";
+            const socket = new WebSocket(wsAddress);
+            socket.onmessage = function (event) {
+                if (event.data === "reload") {
+                    socket.close();
+                    location.reload();
+                }
+            };
+
+            window.onbeforeunload = function() {
+                socket.close();
+            }
+        </script>
 
 
 
