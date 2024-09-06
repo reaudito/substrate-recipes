@@ -3,7 +3,7 @@
 An event is a mechanism for emitting notifications about specific actions or state changes that occur within a blockchain runtime. Events are typically used to inform the outside world about occurrences such as token transfers, account creations, or other significant operations within the blockchain.
 
 
-```rust
+```rust, ignore
 #[pallet::event]
 #[pallet::generate_deposit(pub(super) fn deposit_event)]
 pub enum Event<T: Config> {
@@ -17,7 +17,7 @@ pub enum Event<T: Config> {
 }
 ```
 
-```rust
+```rust, ignores
 #[pallet::call_index(0)]
 #[pallet::weight(T::WeightInfo::do_something())]
 pub fn do_something(origin: OriginFor<T>, something: u32) -> DispatchResult {
