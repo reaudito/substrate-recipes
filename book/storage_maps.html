@@ -224,7 +224,7 @@ storage keys. However, it is perfectly safe to use this hasher to gain performan
 where the users do not control the keys. For example, if the keys in your map are sequentially
 increasing indices and users cannot cause the indices to rapidly increase, then this is a perfectly
 reasonable choice.</p>
-<h3 id="identityy"><a class="header" href="#identityy"><code>Identityy</code></a></h3>
+<h3 id="identity"><a class="header" href="#identity"><code>Identity</code></a></h3>
 <p>The <code>Identity</code> "hasher" is really not a hasher at all, but merely an
 <a href="https://en.wikipedia.org/wiki/Identity_function">identity function</a> that returns the same value it
 receives. This hasher is only an option when the key type in your storage map is <em>already</em> a hash,

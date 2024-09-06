@@ -51,7 +51,7 @@ where the users do not control the keys. For example, if the keys in your map ar
 increasing indices and users cannot cause the indices to rapidly increase, then this is a perfectly
 reasonable choice.
 
-### `Identityy`
+### `Identity`
 
 The `Identity` "hasher" is really not a hasher at all, but merely an
 [identity function](https://en.wikipedia.org/wiki/Identity_function) that returns the same value it
