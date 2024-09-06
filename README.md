@@ -1,5 +1,7 @@
 # substrate-recipes
 
-### Team members
-fragrant99 
-unify89
+
+Tutorial update to latest polkadot SDK:
+
+References:
+https://github.com/reaudito/substrate_recipes
