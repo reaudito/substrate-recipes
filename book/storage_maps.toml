@@ -36,3 +36,19 @@ prompt.distractors = [
 ]
 answer.answer = "When users cannot manipulate the storage map keys."
 id = "e8352c31-5274-4a71-9e99-5f37fed4cc17"
+
+
+[[questions]]
+type = "MultipleChoice"
+prompt.prompt = """
+When updating storage, when is it better to use `insert` instead of `mutate`?
+"""
+prompt.distractors = [
+    "`Insert` is used for modifying existing values, while `mutate` is used for inserting new values.",
+    "`Insert` performs a read operation before writing, while `mutate` only performs a write operation.",
+    "`Insert` is faster than mutate because it uses caching.",
+]
+answer.answer = "`Insert` is used when you don't need to read the existing value, while `mutate` is used when you need to modify the existing value."
+id = "181f71a3-c6b6-4391-9d36-af29b1d4e105"
+
+

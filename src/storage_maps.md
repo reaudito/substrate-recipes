@@ -84,6 +84,20 @@ let entry = <SimpleMap<T>>::take(&user);
             });
 ```
 
+## `insert` and `mutate`
+
+When deciding between `mutate` and `insert` to update storage, consider the following:
+
+`Insert` performs a simple write operation to the database, which is the more efficient option.
+
+On the other hand, `mutate` involves a read operation followed by a write, making it a more expensive database operation.
+
+Therefore, when you have the option to use `insert` (i.e., you don't need to read the existing value), it's recommended to use `insert` over `mutate`.
+
+`Insert` is suitable for inserting or overwriting an existing value. If you simply want to store a specific value, `insert` is the way to go.
+
+`Mutate`, however, is designed for scenarios where you need to modify the existing value or make decisions based on its current state. Use `mutate` when you need to perform conditional updates or modifications that depend on the current value."
+
 
 ## Quiz
 {{#quiz storage_maps.toml}}
