@@ -174,13 +174,18 @@
                 <div id="content" class="content">
                     <main>
                         <h1 id="declaring-a-storagemap"><a class="header" href="#declaring-a-storagemap">Declaring a <code>StorageMap</code></a></h1>
+<p><code>pallets/simple-map</code>
+<a target="_blank" href="https://github.com/reaudito/substrate-recipes/blob/main/polkadot-sdk-solochain-template/pallets/simple-map/src/lib.rs">
+<img src="https://img.shields.io/badge/Github-View%20Code-brightgreen?logo=github" alt ="View on GitHub"/>
+</a></p>
 <p>We declare a single storage map with the following syntax:</p>
 <pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
 </span><span class="boring">fn main() {
 </span>#[pallet::storage]
 #[pallet::getter(fn simple_map)]
-pub type SimpleMap&lt;T: Config&gt; =
-		StorageMap&lt;_, Blake2_128Concat, T::AccountId, u64&gt;;
+pub(super) type SimpleMap&lt;T: Config&gt; =
+    StorageMap&lt;_, Blake2_128Concat, T::AccountId, u32, ValueQuery&gt;;
+
 <span class="boring">}</span></code></pre></pre>
 <p>Explanation of the code:</p>
 <ul>
@@ -201,6 +206,9 @@ pub type SimpleMap&lt;T: Config&gt; =
 </li>
 <li>
 <p><code>u64</code> - its the data type of value of the map.</p>
+</li>
+<li>
+<p><code>ValueQuery</code> - If you omit ValueQuery, when interacting with a simple map, you will get an Option<u32>, which means that if you try to get a value from your StorageMap, you will get either Some(value) or None. Using ValueQuery will always return a value, so you don't have to deal with unwrapping the get calls.</p>
 </li>
 </ul>
 <h2 id="choosing-a-hasher"><a class="header" href="#choosing-a-hasher">Choosing a Hasher</a></h2>
@@ -289,6 +297,22 @@ let entry = &lt;SimpleMap&lt;T&gt;&gt;::take(&amp;user);
 
         </div>
 
+        <!-- Livereload script (if served using the cli tool) -->
+        <script>
+            const wsProtocol = location.protocol === 'https:' ? 'wss:' : 'ws:';
+            const wsAddress = wsProtocol + "//" + location.host + "/" + "__livereload";
+            const socket = new WebSocket(wsAddress);
+            socket.onmessage = function (event) {
+                if (event.data === "reload") {
+                    socket.close();
+                    location.reload();
+                }
+            };
+
+            window.onbeforeunload = function() {
+                socket.close();
+            }
+        </script>
 
 
 

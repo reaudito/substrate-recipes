@@ -90,10 +90,11 @@ pub mod pallet {
     /// information.
     #[pallet::error]
     pub enum Error<T> {
-        /// The value retrieved was `None` as no value was previously set.
-        NoneValue,
-        /// There was an attempt to increment the value in storage over `u32::MAX`.
-        StorageOverflow,
+        /// The requested user has not stored a value yet
+        NoValueStored,
+
+        /// The value cannot be incremented further because it has reached the maximum allowed value
+        MaxValueReached,
     }
 
     /// The pallet's dispatchable functions ([`Call`]s).
@@ -119,6 +120,68 @@ pub mod pallet {
             <SimpleMap<T>>::insert(&user, entry);
 
             Self::deposit_event(Event::EntrySet(user, entry));
+            Ok(().into())
+        }
+
+        /// Read the value stored at a particular key and emit it in an event
+        #[pallet::call_index(1)]
+        #[pallet::weight(0)]
+        pub fn get_single_entry(
+            origin: OriginFor<T>,
+            account: T::AccountId,
+        ) -> DispatchResultWithPostInfo {
+            // Any user can get any other user's entry
+            let getter = ensure_signed(origin)?;
+
+            ensure!(
+                <SimpleMap<T>>::contains_key(&account),
+                Error::<T>::NoValueStored
+            );
+            let entry = <SimpleMap<T>>::get(account);
+            Self::deposit_event(Event::EntryGot(getter, entry));
+            Ok(().into())
+        }
+
+        /// Read the value stored at a particular key, while removing it from the map.
+        /// Also emit the read value in an event
+        #[pallet::call_index(2)]
+        #[pallet::weight(0)]
+        pub fn take_single_entry(origin: OriginFor<T>) -> DispatchResultWithPostInfo {
+            // A user can only take (delete) their own entry
+            let user = ensure_signed(origin)?;
+
+            ensure!(
+                <SimpleMap<T>>::contains_key(&user),
+                Error::<T>::NoValueStored
+            );
+            let entry = <SimpleMap<T>>::take(&user);
+            Self::deposit_event(Event::EntryTaken(user, entry));
+            Ok(().into())
+        }
+
+        /// Increase the value associated with a particular key
+        #[pallet::call_index(3)]
+        #[pallet::weight(0)]
+        pub fn increase_single_entry(
+            origin: OriginFor<T>,
+            add_this_val: u32,
+        ) -> DispatchResultWithPostInfo {
+            // A user can only mutate their own entry
+            let user = ensure_signed(origin)?;
+
+            ensure!(
+                <SimpleMap<T>>::contains_key(&user),
+                Error::<T>::NoValueStored
+            );
+            let original_value = <SimpleMap<T>>::get(&user);
+
+            let new_value = original_value
+                .checked_add(add_this_val)
+                .ok_or(Error::<T>::MaxValueReached)?;
+            <SimpleMap<T>>::insert(&user, new_value);
+
+            Self::deposit_event(Event::EntryIncreased(user, original_value, new_value));
+
             Ok(().into())
         }
     }

@@ -1,12 +1,18 @@
 # Declaring a `StorageMap`
 
+`pallets/simple-map`
+<a target="_blank" href="https://github.com/reaudito/substrate-recipes/blob/main/polkadot-sdk-solochain-template/pallets/simple-map/src/lib.rs">
+	<img src="https://img.shields.io/badge/Github-View%20Code-brightgreen?logo=github" alt ="View on GitHub"/>
+</a>
+
 We declare a single storage map with the following syntax:
 
 ```rust
 #[pallet::storage]
 #[pallet::getter(fn simple_map)]
-pub type SimpleMap<T: Config> =
-		StorageMap<_, Blake2_128Concat, T::AccountId, u64>;
+pub(super) type SimpleMap<T: Config> =
+    StorageMap<_, Blake2_128Concat, T::AccountId, u32, ValueQuery>;
+
 ```
 
 Explanation of the code:
@@ -22,6 +28,8 @@ Map contains key and its value:
 - `T::AccountId` - its the data type of key of the map.
 
 - `u64` - its the data type of value of the map.
+
+- `ValueQuery` - If you omit ValueQuery, when interacting with a simple map, you will get an Option<u32>, which means that if you try to get a value from your StorageMap, you will get either Some(value) or None. Using ValueQuery will always return a value, so you don't have to deal with unwrapping the get calls.
 
 
 ## Choosing a Hasher
