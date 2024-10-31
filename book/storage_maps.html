@@ -179,14 +179,11 @@
 <img src="https://img.shields.io/badge/Github-View%20Code-brightgreen?logo=github" alt ="View on GitHub"/>
 </a></p>
 <p>We declare a single storage map with the following syntax:</p>
-<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
-</span><span class="boring">fn main() {
-</span>#[pallet::storage]
+<pre><code class="language-rust  ignore">#[pallet::storage]
 #[pallet::getter(fn simple_map)]
 pub(super) type SimpleMap&lt;T: Config&gt; =
     StorageMap&lt;_, Blake2_128Concat, T::AccountId, u32, ValueQuery&gt;;
-
-<span class="boring">}</span></code></pre></pre>
+</code></pre>
 <p>Explanation of the code:</p>
 <ul>
 <li>
@@ -208,7 +205,7 @@ pub(super) type SimpleMap&lt;T: Config&gt; =
 <p><code>u64</code> - its the data type of value of the map.</p>
 </li>
 <li>
-<p><code>ValueQuery</code> - If you omit ValueQuery, when interacting with a simple map, you will get an Option<u32>, which means that if you try to get a value from your StorageMap, you will get either Some(value) or None. Using ValueQuery will always return a value, so you don't have to deal with unwrapping the get calls.</p>
+<p><code>ValueQuery</code> - If you omit <code>ValueQuery</code>, when interacting with a simple map, you will get an <code>Option&lt;u32&gt;</code>, which means that if you try to get a value from your <code>StorageMap</code>, you will get either <code>Some(value)</code> or <code>None</code>. Using <code>ValueQuery</code> will always return a value, so you don't have to deal with unwrapping the <code>get</code> calls.</p>
 </li>
 </ul>
 <h2 id="choosing-a-hasher"><a class="header" href="#choosing-a-hasher">Choosing a Hasher</a></h2>

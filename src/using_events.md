@@ -17,7 +17,7 @@ pub enum Event<T: Config> {
 }
 ```
 
-```rust, ignores
+```rust, ignore
 #[pallet::call_index(0)]
 #[pallet::weight(T::WeightInfo::do_something())]
 pub fn do_something(origin: OriginFor<T>, something: u32) -> DispatchResult {

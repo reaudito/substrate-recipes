@@ -7,7 +7,7 @@
 
 We declare a single storage map with the following syntax:
 
-```rust
+```rust, ignore
 #[pallet::storage]
 #[pallet::getter(fn simple_map)]
 pub(super) type SimpleMap<T: Config> =
@@ -29,7 +29,7 @@ Map contains key and its value:
 
 - `u64` - its the data type of value of the map.
 
-- `ValueQuery` - If you omit ValueQuery, when interacting with a simple map, you will get an Option<u32>, which means that if you try to get a value from your StorageMap, you will get either Some(value) or None. Using ValueQuery will always return a value, so you don't have to deal with unwrapping the get calls.
+- `ValueQuery` - If you omit `ValueQuery`, when interacting with a simple map, you will get an `Option<u32>`, which means that if you try to get a value from your `StorageMap`, you will get either `Some(value)` or `None`. Using `ValueQuery` will always return a value, so you don't have to deal with unwrapping the `get` calls.
 
 
 ## Choosing a Hasher

@@ -186,7 +186,7 @@ pub enum Event&lt;T: Config&gt; {
         who: T::AccountId,
     },
 }</code></pre>
-<pre><code class="language-rust  ignores">#[pallet::call_index(0)]
+<pre><code class="language-rust  ignore">#[pallet::call_index(0)]
 #[pallet::weight(T::WeightInfo::do_something())]
 pub fn do_something(origin: OriginFor&lt;T&gt;, something: u32) -&gt; DispatchResult {
     // Check that the extrinsic was signed and get the signer.
