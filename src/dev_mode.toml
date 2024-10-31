@@ -1,0 +1,54 @@
+[[questions]]
+type = "MultipleChoice"
+prompt.prompt = """
+What is dev mode used for?
+"""
+prompt.distractors = [
+    "To assign weights to functions ",
+    "To prevent DoS vulnerabilities",
+    "To perform benchmarking",
+]
+answer.answer = "To write code without assigning weights to functions"
+id = "1cd3b6f2-74d1-45a1-b7e2-027cd59b9f6f"
+
+
+[[questions]]
+type = "MultipleChoice"
+prompt.prompt = """
+What is the purpose of weights in a system?
+"""
+prompt.distractors = [
+    "To prevent network overload",
+    "To measure and limit usage",
+    "Mitigating DoS vulnerabilities",
+]
+answer.answer = "All of the above"
+id = "86927f21-1e89-4ee1-9a87-05e48a7e78bf"
+
+
+[[questions]]
+type = "MultipleChoice"
+prompt.prompt = """
+What is the benefit of using dev mode?
+"""
+prompt.distractors = [
+    "You can write benchmarks immediately",
+    "You can assign weights to functions",
+    "You can prevent network overload",
+]
+answer.answer = "You can write functions without doing benchmarking"
+id = "7081df8e-f1fd-4a78-b570-3b2a4b7b0b87"
+
+
+[[questions]]
+type = "MultipleChoice"
+prompt.prompt = """
+What code is used to activate dev mode?
+"""
+prompt.distractors = [
+    "`#[frame_support::pallet]`",
+    "`#[dev_mode]`",
+    "`#[frame_support]`",
+]
+answer.answer = "`#[frame_support::pallet(dev_mode)]`"
+id = "e46edf36-d69f-470d-83c7-79675d5df311"
