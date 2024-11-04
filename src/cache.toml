@@ -1,0 +1,29 @@
+[[questions]]
+type = "MultipleChoice"
+prompt.prompt = """
+Why should developers minimize calls to runtime storage?
+"""
+prompt.distractors = [
+    "Because runtime storage calls are free.",
+    "To avoid errors in the code.",
+    "To reduce the number of variables.",
+]
+answer.answer = "Because runtime storage calls have an associated cost."
+id = "1f6a3896-47e3-4857-8647-a65098e9b66d"
+
+
+[[questions]]
+type = "MultipleChoice"
+prompt.prompt = """
+If a type is not Copy but is Clone, what is the recommended practice to avoid extra runtime storage calls?
+"""
+prompt.distractors = [
+    "Avoid using the type altogether.",
+    "Make another call to runtime storage.",
+    "Convert the type to Copy.",
+]
+answer.answer = "Clone the value in the method."
+context = """
+
+"""
+id = "6a44ff98-c682-47f0-9f86-51401362dc04"

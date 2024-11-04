@@ -3,8 +3,7 @@
     <head>
         <!-- Book generated using mdBook -->
         <meta charset="UTF-8">
-        <title>Substrate-recipes</title>
-        <meta name="robots" content="noindex">
+        <title>Cache Locally &gt; Storage Calls - Substrate-recipes</title>
 
 
         <!-- Custom HTML head -->
@@ -89,7 +88,7 @@
 
         <nav id="sidebar" class="sidebar" aria-label="Table of contents">
             <div class="sidebar-scrollbox">
-                <ol class="chapter"><li class="chapter-item expanded "><a href="using_events.html"><strong aria-hidden="true">1.</strong> Using Events</a></li><li class="chapter-item expanded "><a href="storage_maps.html"><strong aria-hidden="true">2.</strong> Storage Maps</a></li><li class="chapter-item expanded "><a href="dev_mode.html"><strong aria-hidden="true">3.</strong> Dev Mode</a></li><li class="chapter-item expanded "><a href="cache.html"><strong aria-hidden="true">4.</strong> Cache Locally &gt; Storage Calls</a></li></ol>
+                <ol class="chapter"><li class="chapter-item expanded "><a href="using_events.html"><strong aria-hidden="true">1.</strong> Using Events</a></li><li class="chapter-item expanded "><a href="storage_maps.html"><strong aria-hidden="true">2.</strong> Storage Maps</a></li><li class="chapter-item expanded "><a href="dev_mode.html"><strong aria-hidden="true">3.</strong> Dev Mode</a></li><li class="chapter-item expanded "><a href="cache.html" class="active"><strong aria-hidden="true">4.</strong> Cache Locally &gt; Storage Calls</a></li></ol>
             </div>
             <div id="sidebar-resize-handle" class="sidebar-resize-handle">
                 <div class="sidebar-resize-indicator"></div>
@@ -174,153 +173,7 @@
 
                 <div id="content" class="content">
                     <main>
-                        <h1 id="using-events"><a class="header" href="#using-events">Using Events</a></h1>
-<p>An event is a mechanism for emitting notifications about specific actions or state changes that occur within a blockchain runtime. Events are typically used to inform the outside world about occurrences such as token transfers, account creations, or other significant operations within the blockchain.</p>
-<pre><code class="language-rust  ignore">#[pallet::event]
-#[pallet::generate_deposit(pub(super) fn deposit_event)]
-pub enum Event&lt;T: Config&gt; {
-    /// A user has successfully set a new value.
-    SomethingStored {
-        /// The new value set.
-        something: u32,
-        /// The account who set the new value.
-        who: T::AccountId,
-    },
-}</code></pre>
-<pre><code class="language-rust  ignore">#[pallet::call_index(0)]
-#[pallet::weight(T::WeightInfo::do_something())]
-pub fn do_something(origin: OriginFor&lt;T&gt;, something: u32) -&gt; DispatchResult {
-    // Check that the extrinsic was signed and get the signer.
-    let who = ensure_signed(origin)?;
-
-    // Update storage.
-    Something::&lt;T&gt;::put(something);
-
-    // Emit an event.
-    Self::deposit_event(Event::SomethingStored { something, who });
-
-    // Return a successful `DispatchResult`
-    Ok(())
-}</code></pre>
-<h2 id="quiz"><a class="header" href="#quiz">Quiz</a></h2>
-<div class="quiz-placeholder" data-quiz-name="using_events"  data-quiz-questions="{&quot;questions&quot;:[{&quot;id&quot;:&quot;463d3dec-49f2-4748-baa4-75fee31d49d4&quot;,&quot;type&quot;:&quot;MultipleChoice&quot;,&quot;answer&quot;:{&quot;answer&quot;:&quot;A notification mechanism&quot;},&quot;prompt&quot;:{&quot;distractors&quot;:[&quot;Transaction on the blockchain&quot;,&quot;A smart contract function&quot;,&quot;A consensus algorithm&quot;],&quot;prompt&quot;:&quot;Which of the following best describes an event in the context of substrate blockchain runtime?\n&quot;}},{&quot;context&quot;:&quot;It may display as a wrong answer, even if the answer is correct, if the spacing does not match. Please ignore it if this happens.&quot;,&quot;id&quot;:&quot;b317de89-93f8-48d1-8157-3c8c28fb5b13&quot;,&quot;type&quot;:&quot;ShortAnswer&quot;,&quot;answer&quot;:{&quot;answer&quot;:&quot;Self::deposit_event(Event::MemberAdded { member_id, who });&quot;},&quot;prompt&quot;:{&quot;prompt&quot;:&quot;Emit the `MemberAdded` event with `member_id` and `who`.\n\n```rust\n#[pallet::event]\n#[pallet::generate_deposit(pub(super) fn deposit_event)]\npub enum Event&lt;T: Config&gt; {\n    MemberAdded {\n        member_id: u32,\n        who: T::AccountId,\n    },\n}\n\n#[pallet::call_index(0)]\n#[pallet::weight(T::WeightInfo::add_member())]\npub fn add_member(origin: OriginFor&lt;T&gt;, member_id: u32) -&gt; DispatchResult {\n    let who = ensure_signed(origin)?;\n\n    MemberId::&lt;T&gt;::put(member_id);\n\n    // Emit an event.\n    ______________________\n\n    Ok(())\n}\n```\n&quot;}}]}" ></div>
-<script type="text/javascript" src="quiz/quiz-embed.iife.js"></script><link rel="stylesheet" type="text/css" href="quiz/style.css"><div style="break-before: page; page-break-before: always;"></div><h1 id="declaring-a-storagemap"><a class="header" href="#declaring-a-storagemap">Declaring a <code>StorageMap</code></a></h1>
-<p><code>pallets/simple-map</code>
-<a target="_blank" href="https://github.com/reaudito/substrate-recipes/blob/main/polkadot-sdk-solochain-template/pallets/simple-map/src/lib.rs">
-<img src="https://img.shields.io/badge/Github-View%20Code-brightgreen?logo=github" alt ="View on GitHub"/>
-</a></p>
-<p>We declare a single storage map with the following syntax:</p>
-<pre><code class="language-rust  ignore">#[pallet::storage]
-#[pallet::getter(fn simple_map)]
-pub(super) type SimpleMap&lt;T: Config&gt; =
-    StorageMap&lt;_, Blake2_128Concat, T::AccountId, u32, ValueQuery&gt;;
-</code></pre>
-<p>Explanation of the code:</p>
-<ul>
-<li>
-<p><code>SimpleMap</code> - the name of the storage map</p>
-</li>
-<li>
-<p><code>#[pallet::getter(fn simple_map)]</code> - a getter function <code>simple_map</code> is created using pallet getter macros.</p>
-</li>
-<li>
-<p><code>Blake2_128Concat</code> - its an hasher used in map. More on this below.</p>
-</li>
-</ul>
-<p>Map contains key and its value:</p>
-<ul>
-<li>
-<p><code>T::AccountId</code> - its the data type of key of the map.</p>
-</li>
-<li>
-<p><code>u64</code> - its the data type of value of the map.</p>
-</li>
-<li>
-<p><code>ValueQuery</code> - If you omit <code>ValueQuery</code>, when interacting with a simple map, you will get an <code>Option&lt;u32&gt;</code>, which means that if you try to get a value from your <code>StorageMap</code>, you will get either <code>Some(value)</code> or <code>None</code>. Using <code>ValueQuery</code> will always return a value, so you don't have to deal with unwrapping the <code>get</code> calls.</p>
-</li>
-</ul>
-<h2 id="choosing-a-hasher"><a class="header" href="#choosing-a-hasher">Choosing a Hasher</a></h2>
-<p><a href="https://paritytech.github.io/polkadot-sdk/master/frame_support/trait.StorageHasher.html">Hasher to use to hash keys to insert to storage.</a></p>
-<p>Although the syntax above is complex, most of it should be straightforward if you've understood the
-recipe on storage values. The last unfamiliar piece of writing a storage map is choosing which
-hasher to use. In general you should choose one of the three following hashers. The choice of hasher
-will affect the performance and security of your chain. If you don't want to think much about this,
-just choose <code>Blake2_128Concat</code> and skip to the next section.</p>
-<h3 id="blake2_128concat"><a class="header" href="#blake2_128concat"><code>Blake2_128Concat</code></a></h3>
-<p>This is a cryptographically secure hash function, and is always safe to use. It is reasonably
-efficient, and will keep your storage tree balanced. You <em>must</em> choose this hasher if users of your
-chain have the ability to affect the storage keys. In this pallet, the keys are <code>AccountId</code>s. At
-first it may <em>seem</em> that the user doesn't affect the <code>AccountId</code>, but in reality a malicious user
-can generate thousands of accounts and use the one that will affect the chain's storage tree in the
-way the attacker likes. For this reason, we have chosen to use the <code>Blake2_128Concat</code> hasher.</p>
-<h3 id="twox64concat"><a class="header" href="#twox64concat"><code>Twox64Concat</code></a></h3>
-<p>This hasher is <em>not</em> cryptographically secure, but is more efficient than blake2. Thus it represents
-trading security for performance. You should <em>not</em> use this hasher if chain users can affect the
-storage keys. However, it is perfectly safe to use this hasher to gain performance in scenarios
-where the users do not control the keys. For example, if the keys in your map are sequentially
-increasing indices and users cannot cause the indices to rapidly increase, then this is a perfectly
-reasonable choice.</p>
-<h3 id="identity"><a class="header" href="#identity"><code>Identity</code></a></h3>
-<p>The <code>Identity</code> "hasher" is really not a hasher at all, but merely an
-<a href="https://en.wikipedia.org/wiki/Identity_function">identity function</a> that returns the same value it
-receives. This hasher is only an option when the key type in your storage map is <em>already</em> a hash,
-and is not controllable by the user. If you're in doubt whether the user can influence the key just
-use blake2.</p>
-<h2 id="the-storage-map-api"><a class="header" href="#the-storage-map-api">The Storage Map API</a></h2>
-<p><a href="https://paritytech.github.io/polkadot-sdk/master/frame_support/storage/trait.StorageMap.html">Documentation</a>
-This pallet demonstrated some of the most common methods available in a storage map including
-<code>insert</code>, <code>get</code>, <code>take</code>, and <code>contains_key</code>.</p>
-<pre><code class="language-rust  ignore">// Insert
-&lt;SimpleMap&lt;T&gt;&gt;::insert(&amp;user, entry);
-
-// Get
-let entry = &lt;SimpleMap&lt;T&gt;&gt;::get(account);
-
-// Take
-let entry = &lt;SimpleMap&lt;T&gt;&gt;::take(&amp;user);
-
-// Contains Key
-&lt;SimpleMap&lt;T&gt;&gt;::contains_key(&amp;user)
-
-// Mutate
-&lt;SimpleMap&lt;T&gt;&gt;::mutate(&amp;user, |entry_option| {
-							 *entry_option = Some(entry);
-            });</code></pre>
-<h2 id="insert-and-mutate"><a class="header" href="#insert-and-mutate"><code>insert</code> and <code>mutate</code></a></h2>
-<p>When deciding between <code>mutate</code> and <code>insert</code> to update storage, consider the following:</p>
-<p><code>Insert</code> performs a simple write operation to the database, which is the more efficient option.</p>
-<p>On the other hand, <code>mutate</code> involves a read operation followed by a write, making it a more expensive database operation.</p>
-<p>Therefore, when you have the option to use <code>insert</code> (i.e., you don't need to read the existing value), it's recommended to use <code>insert</code> over <code>mutate</code>.</p>
-<p><code>Insert</code> is suitable for inserting or overwriting an existing value. If you simply want to store a specific value, <code>insert</code> is the way to go.</p>
-<p><code>Mutate</code>, however, is designed for scenarios where you need to modify the existing value or make decisions based on its current state. Use <code>mutate</code> when you need to perform conditional updates or modifications that depend on the current value."</p>
-<h2 id="quiz-1"><a class="header" href="#quiz-1">Quiz</a></h2>
-<div class="quiz-placeholder" data-quiz-name="storage_maps"  data-quiz-questions="{&quot;questions&quot;:[{&quot;id&quot;:&quot;ec184e84-52ef-4b2c-a9cf-4a79cab76531&quot;,&quot;type&quot;:&quot;MultipleChoice&quot;,&quot;answer&quot;:{&quot;answer&quot;:&quot;Blake2_128Concat&quot;},&quot;prompt&quot;:{&quot;distractors&quot;:[&quot;Twox64Concat&quot;,&quot;Both are equally secure&quot;,&quot;It depends on the specific use case&quot;],&quot;prompt&quot;:&quot;Which hasher is more secure to use, Blake2_128Concat or Twox64Concat?\n&quot;}},{&quot;id&quot;:&quot;d0060eeb-396f-4896-ac6a-a9c140f112ee&quot;,&quot;type&quot;:&quot;MultipleChoice&quot;,&quot;answer&quot;:{&quot;answer&quot;:&quot;It is more efficient&quot;},&quot;prompt&quot;:{&quot;distractors&quot;:[&quot;It is more secure&quot;,&quot;It is compatible with more data types&quot;,&quot;It is easier to implement&quot;],&quot;prompt&quot;:&quot;What is the main advantage of using the Twox64Concat hasher?\n&quot;}},{&quot;id&quot;:&quot;e8352c31-5274-4a71-9e99-5f37fed4cc17&quot;,&quot;type&quot;:&quot;MultipleChoice&quot;,&quot;answer&quot;:{&quot;answer&quot;:&quot;When users cannot manipulate the storage map keys.&quot;},&quot;prompt&quot;:{&quot;distractors&quot;:[&quot;When users have the ability to generate and control storage map keys.&quot;,&quot;When the storage map values are randomly generated by the system, and user control the keys.&quot;,&quot;When users have the ability to generate and control their own account IDs.&quot;],&quot;prompt&quot;:&quot;In which of the following scenarios is it considered safe to use the Twox64Concat hasher?\n&quot;}},{&quot;id&quot;:&quot;181f71a3-c6b6-4391-9d36-af29b1d4e105&quot;,&quot;type&quot;:&quot;MultipleChoice&quot;,&quot;answer&quot;:{&quot;answer&quot;:&quot;`Insert` is used when you don't need to read the existing value, while `mutate` is used when you need to modify the existing value.&quot;},&quot;prompt&quot;:{&quot;distractors&quot;:[&quot;`Insert` is used for modifying existing values, while `mutate` is used for inserting new values.&quot;,&quot;`Insert` performs a read operation before writing, while `mutate` only performs a write operation.&quot;,&quot;`Insert` is faster than mutate because it uses caching.&quot;],&quot;prompt&quot;:&quot;When updating storage, when is it better to use `insert` instead of `mutate`?\n&quot;}}]}" ></div>
-<script type="text/javascript" src="quiz/quiz-embed.iife.js"></script><link rel="stylesheet" type="text/css" href="quiz/style.css"><div style="break-before: page; page-break-before: always;"></div><h1 id="dev-mode"><a class="header" href="#dev-mode">Dev Mode</a></h1>
-<p>Dev mode allows you to write code without assigning weights to functions. Weights are an essential mechanism for measuring and limiting usage, establishing an economic incentive structure, preventing network overload, and mitigating DoS vulnerabilities. Weights are calculated during benchmarking.</p>
-<p>If you want to write functions without doing benchmarking, you can use dev mode. You can write the benchmark later on, once you've completed the prototyping and testing.</p>
-<p>To convert your pallet to dev mode, use <code>#[frame_support::pallet(dev_mode)]</code></p>
-<p>Use:</p>
-<pre><code class="language-rust ignore">#[frame_support::pallet(dev_mode)]
-pub mod pallet {</code></pre>
-<p>instead of</p>
-<pre><code class="language-rust ignore">#[frame_support::pallet]
-pub mod pallet {</code></pre>
-<p>You can write functions without assigning any weight using 	<code>#[pallet::weight(0)]</code></p>
-<pre><code class="language-rust ignore">#[pallet::call]
-impl&lt;T: Config&gt; Pallet&lt;T&gt; {
-	#[pallet::call_index(0)]
-	#[pallet::weight(0)]
-	pub fn do_something(origin: OriginFor&lt;T&gt;, something: u32) -&gt; DispatchResult {
-		let who = ensure_signed(origin)?;
-
-		Something::&lt;T&gt;::put(something);
-		Self::deposit_event(Event::SomethingStored { something, who });
-
-		Ok(())
-	}</code></pre>
-<h2 id="quiz-2"><a class="header" href="#quiz-2">Quiz</a></h2>
-<div class="quiz-placeholder" data-quiz-name="dev_mode"  data-quiz-questions="{&quot;questions&quot;:[{&quot;id&quot;:&quot;1cd3b6f2-74d1-45a1-b7e2-027cd59b9f6f&quot;,&quot;type&quot;:&quot;MultipleChoice&quot;,&quot;answer&quot;:{&quot;answer&quot;:&quot;To write code without assigning weights to functions&quot;},&quot;prompt&quot;:{&quot;distractors&quot;:[&quot;To assign weights to functions &quot;,&quot;To prevent DoS vulnerabilities&quot;,&quot;To perform benchmarking&quot;],&quot;prompt&quot;:&quot;What is dev mode used for?\n&quot;}},{&quot;id&quot;:&quot;86927f21-1e89-4ee1-9a87-05e48a7e78bf&quot;,&quot;type&quot;:&quot;MultipleChoice&quot;,&quot;answer&quot;:{&quot;answer&quot;:&quot;All of the above&quot;},&quot;prompt&quot;:{&quot;distractors&quot;:[&quot;To prevent network overload&quot;,&quot;To measure and limit usage&quot;,&quot;Mitigating DoS vulnerabilities&quot;],&quot;prompt&quot;:&quot;What is the purpose of weights in a system?\n&quot;}},{&quot;id&quot;:&quot;7081df8e-f1fd-4a78-b570-3b2a4b7b0b87&quot;,&quot;type&quot;:&quot;MultipleChoice&quot;,&quot;answer&quot;:{&quot;answer&quot;:&quot;You can write functions without doing benchmarking&quot;},&quot;prompt&quot;:{&quot;distractors&quot;:[&quot;You can write benchmarks immediately&quot;,&quot;You can assign weights to functions&quot;,&quot;You can prevent network overload&quot;],&quot;prompt&quot;:&quot;What is the benefit of using dev mode?\n&quot;}},{&quot;id&quot;:&quot;e46edf36-d69f-470d-83c7-79675d5df311&quot;,&quot;type&quot;:&quot;MultipleChoice&quot;,&quot;answer&quot;:{&quot;answer&quot;:&quot;`#[frame_support::pallet(dev_mode)]`&quot;},&quot;prompt&quot;:{&quot;distractors&quot;:[&quot;`#[frame_support::pallet]`&quot;,&quot;`#[dev_mode]`&quot;,&quot;`#[frame_support]`&quot;],&quot;prompt&quot;:&quot;What code is used to activate dev mode?\n&quot;}}]}" ></div>
-<script type="text/javascript" src="quiz/quiz-embed.iife.js"></script><link rel="stylesheet" type="text/css" href="quiz/style.css"><div style="break-before: page; page-break-before: always;"></div><h1 id="cache-multiple-calls"><a class="header" href="#cache-multiple-calls">Cache Multiple Calls</a></h1>
+                        <h1 id="cache-multiple-calls"><a class="header" href="#cache-multiple-calls">Cache Multiple Calls</a></h1>
 <p><code>pallets/storage-cache</code>
 <a target="_blank" href="https://github.com/reaudito/substrate-recipes/blob/main/polkadot-sdk-solochain-template/pallets/storage-cache/src/lib.rs">
 <img src="https://img.shields.io/badge/Github-View%20Code-brightgreen?logo=github" alt ="View on GitHub"/>
@@ -472,13 +325,16 @@ error: could not compile `pallet-storage-cache` (lib) due to 1 previous error
 <p>Not all types implement <a href="https://doc.rust-lang.org/std/marker/trait.Copy.html"><code>Copy</code></a> or
 <a href="https://doc.rust-lang.org/std/clone/trait.Clone.html"><code>Clone</code></a>, so it is important to discern other
 patterns that minimize and alleviate the cost of calls to storage.</p>
-<h2 id="quiz-3"><a class="header" href="#quiz-3">Quiz</a></h2>
+<h2 id="quiz"><a class="header" href="#quiz">Quiz</a></h2>
 <div class="quiz-placeholder" data-quiz-name="cache"  data-quiz-questions="{&quot;questions&quot;:[{&quot;id&quot;:&quot;1f6a3896-47e3-4857-8647-a65098e9b66d&quot;,&quot;type&quot;:&quot;MultipleChoice&quot;,&quot;answer&quot;:{&quot;answer&quot;:&quot;Because runtime storage calls have an associated cost.&quot;},&quot;prompt&quot;:{&quot;distractors&quot;:[&quot;Because runtime storage calls are free.&quot;,&quot;To avoid errors in the code.&quot;,&quot;To reduce the number of variables.&quot;],&quot;prompt&quot;:&quot;Why should developers minimize calls to runtime storage?\n&quot;}},{&quot;context&quot;:&quot;\n&quot;,&quot;id&quot;:&quot;6a44ff98-c682-47f0-9f86-51401362dc04&quot;,&quot;type&quot;:&quot;MultipleChoice&quot;,&quot;answer&quot;:{&quot;answer&quot;:&quot;Clone the value in the method.&quot;},&quot;prompt&quot;:{&quot;distractors&quot;:[&quot;Avoid using the type altogether.&quot;,&quot;Make another call to runtime storage.&quot;,&quot;Convert the type to Copy.&quot;],&quot;prompt&quot;:&quot;If a type is not Copy but is Clone, what is the recommended practice to avoid extra runtime storage calls?\n&quot;}}]}" ></div>
 <script type="text/javascript" src="quiz/quiz-embed.iife.js"></script><link rel="stylesheet" type="text/css" href="quiz/style.css">
                     </main>
 
                     <nav class="nav-wrapper" aria-label="Page navigation">
                         <!-- Mobile navigation buttons -->
+                            <a rel="prev" href="dev_mode.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                                <i class="fa fa-angle-left"></i>
+                            </a>
 
 
                         <div style="clear: both"></div>
@@ -487,6 +343,9 @@ patterns that minimize and alleviate the cost of calls to storage.</p>
             </div>
 
             <nav class="nav-wide-wrapper" aria-label="Page navigation">
+                    <a rel="prev" href="dev_mode.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                        <i class="fa fa-angle-left"></i>
+                    </a>
 
             </nav>
 
@@ -510,11 +369,6 @@ patterns that minimize and alleviate the cost of calls to storage.</p>
 
         <!-- Custom JS scripts -->
 
-        <script>
-        window.addEventListener('load', function() {
-            window.setTimeout(window.print, 100);
-        });
-        </script>
 
     </div>
     </body>
