@@ -89,7 +89,7 @@
 
         <nav id="sidebar" class="sidebar" aria-label="Table of contents">
             <div class="sidebar-scrollbox">
-                <ol class="chapter"><li class="chapter-item expanded "><a href="using_events.html"><strong aria-hidden="true">1.</strong> Using Events</a></li><li class="chapter-item expanded "><a href="storage_maps.html"><strong aria-hidden="true">2.</strong> Storage Maps</a></li><li class="chapter-item expanded "><a href="dev_mode.html"><strong aria-hidden="true">3.</strong> Dev Mode</a></li><li class="chapter-item expanded "><a href="cache.html"><strong aria-hidden="true">4.</strong> Cache Locally &gt; Storage Calls</a></li></ol>
+                <ol class="chapter"><li class="chapter-item expanded "><a href="using_events.html"><strong aria-hidden="true">1.</strong> Using Events</a></li><li class="chapter-item expanded "><a href="storage_maps.html"><strong aria-hidden="true">2.</strong> Storage Maps</a></li><li class="chapter-item expanded "><a href="dev_mode.html"><strong aria-hidden="true">3.</strong> Dev Mode</a></li><li class="chapter-item expanded "><a href="cache.html"><strong aria-hidden="true">4.</strong> Cache Locally &gt; Storage Calls</a></li><li class="chapter-item expanded "><a href="vec_set.html"><strong aria-hidden="true">5.</strong> Using Vectors as Set</a></li></ol>
             </div>
             <div id="sidebar-resize-handle" class="sidebar-resize-handle">
                 <div class="sidebar-resize-indicator"></div>
@@ -474,7 +474,116 @@ error: could not compile `pallet-storage-cache` (lib) due to 1 previous error
 patterns that minimize and alleviate the cost of calls to storage.</p>
 <h2 id="quiz-3"><a class="header" href="#quiz-3">Quiz</a></h2>
 <div class="quiz-placeholder" data-quiz-name="cache"  data-quiz-questions="{&quot;questions&quot;:[{&quot;id&quot;:&quot;1f6a3896-47e3-4857-8647-a65098e9b66d&quot;,&quot;type&quot;:&quot;MultipleChoice&quot;,&quot;answer&quot;:{&quot;answer&quot;:&quot;Because runtime storage calls have an associated cost.&quot;},&quot;prompt&quot;:{&quot;distractors&quot;:[&quot;Because runtime storage calls are free.&quot;,&quot;To avoid errors in the code.&quot;,&quot;To reduce the number of variables.&quot;],&quot;prompt&quot;:&quot;Why should developers minimize calls to runtime storage?\n&quot;}},{&quot;context&quot;:&quot;\n&quot;,&quot;id&quot;:&quot;6a44ff98-c682-47f0-9f86-51401362dc04&quot;,&quot;type&quot;:&quot;MultipleChoice&quot;,&quot;answer&quot;:{&quot;answer&quot;:&quot;Clone the value in the method.&quot;},&quot;prompt&quot;:{&quot;distractors&quot;:[&quot;Avoid using the type altogether.&quot;,&quot;Make another call to runtime storage.&quot;,&quot;Convert the type to Copy.&quot;],&quot;prompt&quot;:&quot;If a type is not Copy but is Clone, what is the recommended practice to avoid extra runtime storage calls?\n&quot;}}]}" ></div>
-<script type="text/javascript" src="quiz/quiz-embed.iife.js"></script><link rel="stylesheet" type="text/css" href="quiz/style.css">
+<script type="text/javascript" src="quiz/quiz-embed.iife.js"></script><link rel="stylesheet" type="text/css" href="quiz/style.css"><div style="break-before: page; page-break-before: always;"></div><h1 id="using-vectors-as-sets"><a class="header" href="#using-vectors-as-sets">Using Vectors as Sets</a></h1>
+<p><code>pallets/vec-set</code>
+<a target="_blank" href="">
+<img src="https://img.shields.io/badge/Github-View%20Code-brightgreen?logo=github" alt ="View on GitHub"/>
+</a></p>
+<p>A <a href="https://en.wikipedia.org/wiki/Set_(abstract_data_type)">Set</a> is an unordered data structure
+that stores entries without duplicates. Substrate's storage API does not provide a way to declare
+sets explicitly, but they can be implemented using either vectors or maps.</p>
+<p>This recipe demonstrates how to implement a storage set on top of a vector, and explores the
+performance of the implementation. When implementing a set in your own runtime, you should compare
+this technique to implementing a <a href="./map-set.html"><code>map-set</code></a>.</p>
+<p>In this pallet we implement a set of <code>AccountId</code>s. We do not use the set for anything in this
+pallet; we simply maintain the set. Using the set is demonstrated in the recipe on
+<a href="./pallet-coupling.html">pallet coupling</a>. We provide dispatchable calls to add and remove members,
+ensuring that the number of members never exceeds a hard-coded maximum.</p>
+<pre><code class="language-rust  ignore">/// A maximum number of members. When membership reaches this number, no new members may join.
+pub const MAX_MEMBERS: usize = 16;</code></pre>
+<h2 id="storage-item"><a class="header" href="#storage-item">Storage Item</a></h2>
+<p>We will store the members of our set in a Rust
+<a href="https://doc.rust-lang.org/std/vec/struct.Vec.html"><code>Vec</code></a>. A <code>Vec</code> is a collection of elements that
+is ordered and may contain duplicates. Because the <code>Vec</code> provides more functionality than our set
+needs, we are able to build a set from the <code>Vec</code>. We declare our single storage item as so</p>
+<pre><code class="language-rust  ignore">#[pallet::storage]
+#[pallet::getter(fn members)]
+pub(super) type Members&lt;T: Config&gt; = StorageValue&lt;_, Vec&lt;T::AccountId&gt;, ValueQuery&gt;;</code></pre>
+<p>In order to use the <code>Vec</code> successfully as a set, we will need to manually ensure that no duplicate
+entries are added. To ensure reasonable performance, we will enforce that the <code>Vec</code> always remains
+sorted. This allows for quickly determining whether an item is present using a
+<a href="https://en.wikipedia.org/wiki/Binary_search_algorithm">binary search</a>.</p>
+<h2 id="adding-members"><a class="header" href="#adding-members">Adding Members</a></h2>
+<p>Any user may join the membership set by calling the <code>add_member</code> dispatchable, providing they are
+not already a member and the membership limit has not been reached. We check for these two
+conditions first, and then insert the new member only after we are sure it is safe to do so. This is
+an example of the mnemonic idiom, "<strong>verify first write last</strong>".</p>
+<pre><code class="language-rust  ignore">pub fn add_member(origin: OriginFor&lt;T&gt;) -&gt; DispatchResult {
+	let new_member = ensure_signed(origin)?;
+
+	let mut members = Members::&lt;T&gt;::get();
+	ensure!(members.len() &lt; MAX_MEMBERS, Error::&lt;T&gt;::MembershipLimitReached);
+
+	// We don't want to add duplicate members, so we check whether the potential new
+	// member is already present in the list. Because the list is always ordered, we can
+	// leverage the binary search which makes this check O(log n).
+	match members.binary_search(&amp;new_member) {
+		// If the search succeeds, the caller is already a member, so just return
+		Ok(_) =&gt; Err(Error::&lt;T&gt;::AlreadyMember.into()),
+		// If the search fails, the caller is not a member and we learned the index where
+		// they should be inserted
+		Err(index) =&gt; {
+			members.insert(index, new_member.clone());
+			Members::&lt;T&gt;::put(members);
+			Self::deposit_event(Event::MemberAdded(new_member));
+			Ok(())
+		}
+	}
+}</code></pre>
+<p>If it turns out that the caller is not already a member, the binary search will fail. In this case
+it still returns the index into the <code>Vec</code> at which the member would have been stored had they been
+present. We then use this information to insert the member at the appropriate location, thus
+maintaining a sorted <code>Vec</code>.</p>
+<h2 id="removing-a-member"><a class="header" href="#removing-a-member">Removing a Member</a></h2>
+<p>Removing a member is straightforward. We begin by looking for the caller in the list. If not
+present, there is no work to be done. If the caller is present, the search algorithm returns her
+index, and she can be removed.</p>
+<pre><code class="language-rust  ignore">fn remove_member(origin: OriginFor&lt;T&gt;) -&gt; DispatchResult {
+	let old_member = ensure_signed(origin)?;
+
+	let mut members = Members::&lt;T&gt;::get();
+
+	// We have to find out where, in the sorted vec the member is, if anywhere.
+	match members.binary_search(&amp;old_member) {
+		// If the search succeeds, the caller is a member, so remove her
+		Ok(index) =&gt; {
+			members.remove(index);
+			Members::&lt;T&gt;::put(members);
+			Self::deposit_event(Event::MemberRemoved(old_member));
+			Ok(())
+		},
+		// If the search fails, the caller is not a member, so just return
+		Err(_) =&gt; Err(Error::&lt;T&gt;::NotMember.into()),
+	}
+}</code></pre>
+<h2 id="performance"><a class="header" href="#performance">Performance</a></h2>
+<p>Now that we have built our set, let's analyze its performance in some common operations.</p>
+<h3 id="membership-check"><a class="header" href="#membership-check">Membership Check</a></h3>
+<p>In order to check for the presence of an item in a <code>vec-set</code>, we make a single storage read, decode
+the entire vector, and perform a binary search.</p>
+<p>DB Reads: O(1) Decoding: O(n) Search: O(log n)</p>
+<h3 id="updating"><a class="header" href="#updating">Updating</a></h3>
+<p>Updates to the set, such as adding and removing members as we demonstrated, requires first
+performing a membership check. It also requires re-encoding the entire <code>Vec</code> and storing it back in
+the database. Finally, it still costs the normal
+<a href="https://stackoverflow.com/q/200384/4184410">amortized constant time</a> associated with mutating a
+<code>Vec</code>.</p>
+<p>DB Writes: O(1) Encoding: O(n)</p>
+<h3 id="iteration"><a class="header" href="#iteration">Iteration</a></h3>
+<p>Iterating over all items in a <code>vec-set</code> is achieved by using the <code>Vec</code>'s own
+<a href="https://doc.rust-lang.org/std/vec/struct.Vec.html#method.iter"><code>iter</code> method</a>. The entire set can
+be read from storage in one go, and each item must be decoded. Finally, the actual processing you do
+on the items will take some time.</p>
+<p>DB Reads: O(1) Decoding: O(n) Processing: O(n)</p>
+<p>Because accessing the database is a relatively slow operation, reading the entire list in a single
+read is a big win. If you need to iterate over the data frequently, you may want a <code>vec-set</code>.</p>
+<h3 id="a-note-on-weights"><a class="header" href="#a-note-on-weights">A Note on Weights</a></h3>
+<p>It is always important that the weight associated with your dispatchables represent the actual time
+it takes to execute them. In this pallet, we have provided an upper bound on the size of the set,
+which places an upper bound on the computation - this means we can use constant weight annotations.
+Your set operations should either have a maximum size or a <a href="./weights.html">custom weight function</a>
+that captures the computation appropriately.</p>
+
                     </main>
 
                     <nav class="nav-wrapper" aria-label="Page navigation">
