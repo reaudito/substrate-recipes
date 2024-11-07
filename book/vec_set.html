@@ -88,7 +88,7 @@
 
         <nav id="sidebar" class="sidebar" aria-label="Table of contents">
             <div class="sidebar-scrollbox">
-                <ol class="chapter"><li class="chapter-item expanded "><a href="using_events.html"><strong aria-hidden="true">1.</strong> Using Events</a></li><li class="chapter-item expanded "><a href="storage_maps.html"><strong aria-hidden="true">2.</strong> Storage Maps</a></li><li class="chapter-item expanded "><a href="dev_mode.html"><strong aria-hidden="true">3.</strong> Dev Mode</a></li><li class="chapter-item expanded "><a href="cache.html"><strong aria-hidden="true">4.</strong> Cache Locally &gt; Storage Calls</a></li><li class="chapter-item expanded "><a href="vec_set.html" class="active"><strong aria-hidden="true">5.</strong> Using Vectors as Set</a></li></ol>
+                <ol class="chapter"><li class="chapter-item expanded "><a href="using_events.html"><strong aria-hidden="true">1.</strong> Using Events</a></li><li class="chapter-item expanded "><a href="storage_maps.html"><strong aria-hidden="true">2.</strong> Storage Maps</a></li><li class="chapter-item expanded "><a href="dev_mode.html"><strong aria-hidden="true">3.</strong> Dev Mode</a></li><li class="chapter-item expanded "><a href="cache.html"><strong aria-hidden="true">4.</strong> Cache Locally &gt; Storage Calls</a></li><li class="chapter-item expanded "><a href="vec_set.html" class="active"><strong aria-hidden="true">5.</strong> Using Vectors as Set</a></li><li class="chapter-item expanded "><a href="map_set.html"><strong aria-hidden="true">6.</strong> Using Maps as Sets</a></li></ol>
             </div>
             <div id="sidebar-resize-handle" class="sidebar-resize-handle">
                 <div class="sidebar-resize-indicator"></div>
@@ -183,7 +183,7 @@ that stores entries without duplicates. Substrate's storage API does not provide
 sets explicitly, but they can be implemented using either vectors or maps.</p>
 <p>This recipe demonstrates how to implement a storage set on top of a vector, and explores the
 performance of the implementation. When implementing a set in your own runtime, you should compare
-this technique to implementing a <a href="./map-set.html"><code>map-set</code></a>.</p>
+this technique to implementing a <a href="./map_set.html"><code>map-set</code></a>.</p>
 <p>In this pallet we implement a set of <code>AccountId</code>s. We do not use the set for anything in this
 pallet; we simply maintain the set. Using the set is demonstrated in the recipe on
 <a href="./pallet-coupling.html">pallet coupling</a>. We provide dispatchable calls to add and remove members,
@@ -291,6 +291,9 @@ that captures the computation appropriately.</p>
                                 <i class="fa fa-angle-left"></i>
                             </a>
 
+                            <a rel="next prefetch" href="map_set.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                                <i class="fa fa-angle-right"></i>
+                            </a>
 
                         <div style="clear: both"></div>
                     </nav>
@@ -302,6 +305,9 @@ that captures the computation appropriately.</p>
                         <i class="fa fa-angle-left"></i>
                     </a>
 
+                    <a rel="next prefetch" href="map_set.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                        <i class="fa fa-angle-right"></i>
+                    </a>
             </nav>
 
         </div>

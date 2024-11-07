@@ -11,7 +11,7 @@ sets explicitly, but they can be implemented using either vectors or maps.
 
 This recipe demonstrates how to implement a storage set on top of a vector, and explores the
 performance of the implementation. When implementing a set in your own runtime, you should compare
-this technique to implementing a [`map-set`](./map-set.md).
+this technique to implementing a [`map-set`](./map_set.md).
 
 In this pallet we implement a set of `AccountId`s. We do not use the set for anything in this
 pallet; we simply maintain the set. Using the set is demonstrated in the recipe on
